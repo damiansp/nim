@@ -80,3 +80,121 @@ while yourName == "":
   echo "Your name, please: "
   yourName = readLine(stdin)
 
+
+# for
+echo "Counting to 10..."
+for i in countup(1, 10):
+  echo i
+
+var i = 1
+while i <= 10:
+  echo i
+  inc(i)
+
+echo "Counting down from 10..."
+for i in countdown(10, 1):
+  echo i
+
+for i in 1..10:
+  echo i
+
+for i in 0..<10:
+  echo i
+
+var s = "some string"
+for i in 0..<s.len:
+  echo s[i]
+
+for i, item in ["a", "b"].pairs: # = python enumberate(['a', 'b'])
+  echo item, " at index ", i
+
+block myblock:
+  echo "entering block"
+  while true:
+    echo "looping..."
+    break
+  echo "still in block"
+
+block myblock2:
+  echo "entering 2nd block"
+  while true:
+    echo "looping...."
+    break myblock2
+  echo "This should be unreachable"
+
+# When: 
+echo "Running on... "
+when system.hostOS == "windows":
+  echo "...Winders"
+elif system.hostOS == "linux":
+  echo "...Linnix"
+elif system.hostOS == "macosx":
+  echo "...Osux"
+else:
+  echo "...Ida know"
+
+
+# Procedures (functions)
+proc yes(question: string): bool =
+  echo question, "(y/n)"
+  while true:
+    case readLine(stdin)
+    of "y", "Y", "yes", "Yes", "YES": return true
+    of "n", "N", "no", "No", "NO": return false
+    else: echo "Please be clear: yes or no?"
+
+if yes("Should I delete all your files?"):
+  echo "I'm sorry Dave, I'm afraid I can't do that."
+else:
+  echo "I think you know what the problem is just as well as I do"
+
+
+# Result
+proc sumTillNegative(x: varargs[int]): int =
+  for i in x:
+    if i < 0:
+      return
+    result = result + i
+
+echo sumTillNegative() # 0
+echo sumTillNegative(3, 4, 5) # 12
+echo sumTillNegative(3, 4, -1, 6) # 7
+
+
+# Parameters
+proc printSeq(s: seq, nprinted: int = -1) =
+  var nprinted = if nprinted == -1: s.len else: min(nprinted, s.len)
+  for i in 0..<nprinted:
+    echo s[i]
+
+proc divmod(a, b: int; res, remainder: var int) =
+  res = a div b # integer division
+  remainder = a mod b
+
+var 
+  j, k: int
+divmod(8, 5, j, k)
+echo j
+echo k
+
+discard yes("May I ask a pointless question?")
+
+proc p(x, y: int): int {.discardable.} = 
+  return x + y
+
+p(3, 4)
+
+
+# Named Args
+#proc createWindow(x, y, width, height: int; title: string; show: bool): Window =
+#  ...
+
+#var w = createWindow(show=true, title="My App", x=0, y=0, height=600, widht=800)
+
+
+# Default Args
+#proc createWindow(
+#     x=0, y=0, width=550, height=700, title="Unknown", show=true): Window = 
+# ...
+#
+# var w = createWindow(title="My App", height=600)
