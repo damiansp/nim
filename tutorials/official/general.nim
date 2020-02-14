@@ -1,3 +1,4 @@
+#---------#---------#---------#---------#---------#---------#---------#---------
 var x, y: int
 var
   x2, y2: int
@@ -198,3 +199,50 @@ p(3, 4)
 # ...
 #
 # var w = createWindow(title="My App", height=600)
+
+
+# Overloaded Procs
+#proc toString(x: int): string = str(x)
+proc toString(x: bool): string =
+  if x: result = "true"
+  else:
+    result = "false"
+
+
+# Forward declaration
+proc even(n: int): bool # forward declaration
+
+proc odd(n: int): bool =
+  assert(n >= 0)
+  if n == 0: false
+  else:
+    n == 1 or even(n - 1)
+
+proc even(n: int): bool =
+  assert(n >= 0)
+  if  n == 1: false
+  else:
+    n == 0 or odd(n - 1)
+
+
+# Iterators
+echo "Counting to 10: "
+for i in countup(1, 10):
+  echo i
+
+iterator myCountup(a, b: int): int =
+  var res = a
+  while res <= b:
+    yield res
+    inc(res)
+
+
+# Enumerations
+type
+  Direction = enum
+    north, east, south, writeStackTrace
+
+var d = south
+echo d
+
+
