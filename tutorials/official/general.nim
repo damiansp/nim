@@ -246,3 +246,166 @@ var d = south
 echo d
 
 
+# Subranges
+type
+  MySubrange = range[0..5]
+
+# The MySubrange type can only be an int between 0 and 5
+
+
+# Sets
+type
+  CharSet = set[char]
+var
+  cs: CharSet
+cs = {'a'..'z', '0'..'9'}
+
+
+# Bit Fields
+type
+  MyFlag* {.size: sizeof(cint).} = enum
+    A
+    B
+    C
+    D
+  MyFlags = set[MyFlag]
+
+proc toNum(f: MyFlags): int = cast[cint](f)
+proc toFlags(v: int): MyFlags = cast[MyFlags](v)
+
+assert toNum({}) == 0
+assert toNum({A}) == 1
+assert toNum({D}) == 8
+assert toNum({A, C}) == 5
+#assert toFlags(0) = {}
+#assert toFlags(7) = {A, B, C}
+
+
+# Arrays
+type
+  IntArray = array[0..5, int]
+var 
+  ia: IntArray
+ia = [12, 34, 45, 78, 90, 10]
+for i in low(ia)..high(ia): # low and high indices (not values)
+  echo ia[i]
+
+type
+  Dir = enum
+    narth, eest, suth, wist
+  BlinkLights = enum
+    off, on, slowBlink, mediumBlink, fastBlink
+  LevelSetting = array[narth..wist, BlinkLights]
+var
+  level: LevelSetting
+level[narth] = on
+level[suth] = slowBlink
+level[eest] = fastBlink
+echo repr(level) # [on, fastBlink, slowBlink, off]
+echo low(level)  # narth
+echo len(level)  # 4
+echo high(level) # wist
+
+type
+  LightTower = array[1..10, LevelSetting]
+var
+  tower: LightTower
+tower[1][narth] = slowBlink
+tower[1][eest] = mediumBlink
+echo len(tower) # 10
+echo len(tower[1]) # 4
+echo repr(tower)  # [[slowBlink, mediumBlink, ...]...]
+
+type
+  AnIntArray = array[0..5, int]
+  QuickArray = array[6, int] # also indexed from 0 to 5
+var
+  aia: AnIntArray
+  qa: QuickArray
+aia = [1, 2, 3, 4, 5, 6]
+qa = aia
+for i in low(aia)..high(aia):
+  echo aia[i], qa[i]
+
+
+# Sequences (dynamic length arrays)
+# [] array constructor; @ array to seq operator
+var
+  sq: seq[int]
+sq = @[1, 2, 3, 4, 5, 6] # @ turns array into seq allocated on heap
+
+for value in @[3, 4, 5]:
+  echo value # 3 4 5
+
+for i, value in @[3, 4, 5]: # like python enumerate([3, 4, 5])
+  echo "index: ", $i, "; value: ", $value
+
+
+# Open arrays (can only be used for params)
+var
+  fruits: seq[string]
+  capitals: array[3, string]
+
+capitals = ["New York", "London", "Berlin"]
+fruits.add("Banana")
+fruits.add("Mango")
+
+proc openArraySize(oa: openArray[string]): int =
+  oa.len
+
+assert openArraySize(fruits) == 2   # openArraySize accepts seq as param...
+assert openArraySize(capitals) == 3 # ...but also an array
+
+
+# Varargs
+proc myWriteln(f: File, a: varargs[string]) =
+  for s in items(a):
+    write(f, s)
+  write(f, "\n")
+
+myWriteln(stdout, "abc", "def", "xyz")
+# compiler transforms previous to 
+# myWriteln(stdout, ["abc", "def", "xyz"])
+
+proc myWrite2(f: File, a: varargs[string, `$`]) =
+  for s in items(a):
+    write(f, s)
+  write(f, "\n")
+
+myWrite2(stdout, 123, "abc", 4.0)
+# compiler transforms previous to 
+# myWrite2(stdout, [$123, $"abc", $4.0])
+
+
+# Slices
+var
+  nm = "Nim is short for Nimrod"
+  sl = "Slices are useless."
+
+echo nm[7..12] # short
+sl[11..^2] = "useful"
+echo sl # Slices are useful
+
+
+# Objects
+type
+  Person = object
+    name: string
+    age: int
+var person1 = Person(name: "Peter", age: 30)
+echo person1.name # Peter
+echo person1.age  # 30
+
+var person2 = person1 # copy (not reference)
+person2.age += 14
+echo person2.age # 44
+echo person1.age # 30 (still)
+
+let person3 = Person(age: 0) # person3.name currently ""
+doAssert person3.name == ""
+
+type
+  Human* = object # * indicates type is visible to other modules
+    name*: string   # this field vis to other modules
+    age*: int
+
