@@ -1,4 +1,6 @@
 #---------#---------#---------#---------#---------#---------#---------#---------
+import os
+
 var x, y: int
 var
   x2, y2: int
@@ -409,3 +411,62 @@ type
     name*: string   # this field vis to other modules
     age*: int
 
+
+# Tuples
+type
+  # type representing a person with name and age
+  Dude = tuple
+    name: string
+    age: int
+  
+  # alternate syntax
+  DudeX = tuple[name: string, age: int]
+
+  # anonymous field string
+  DudeY = (string, int)
+
+var
+  dude: Dude
+  dudeX: DudeX
+  dudeY: DudeY
+
+dude = (name: "Peter", age: 30)
+dudeX = dude
+dudeY = ("Peter", 30) # anonymous fields
+echo dude.name, dude.age
+echo dude[0], dude[1]
+
+var building: tuple[street: string, number: int]
+building = ("Rue de Marchand", 13)
+
+
+let
+  path = "usr/local/nimc.html"
+  (dir, fname, ext) = splitFile(path)
+  baddir, badfname, badext = splitFile(path)
+
+echo dir, baddir # usr/local, (dir: usr/local, name: nimc, ext: .html)
+echo fname, badfname # nimc, (dir: usr/local, name: nimc, ext: .html)
+echo ext, badext   # html, (dir: usr/local, name: nimc, ext: .html)
+
+# Ref and Pointer types
+type
+  Node = ref object 
+    le, ri: Node 
+    data: int
+var
+  node: Node 
+new(node)
+node.data = 9
+
+
+# Procedural Type
+proc echoItem(x: int) = echo x
+
+proc forEach(action: proc (x: int)) =
+  const
+    data = [2, 3, 5, 7, 11]
+  for d in items(data):
+    action(d)
+
+forEach(echoItem)
