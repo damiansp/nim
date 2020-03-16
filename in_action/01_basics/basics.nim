@@ -217,6 +217,74 @@ proc second() =
   raise newException(IOError, "Somebody sent us the bomb")
 
 proc first() =
-  second()
+  try:
+    second()
+  except:
+    echo("Cannot perform second(): " & getCurrentExceptionMsg())
 
 first()
+
+
+# Objects
+type
+  Person = object
+    name: string
+    age: int
+
+var person: Person(name: "Neo", age: 28)
+
+type
+  PersonObj = object 
+    name: string
+    age: int
+  PersonRef = ref PersonObj
+
+# This fails: can't modify a non-ref param b/c might have been copied
+# prior to this. E.g., param is immutable
+#proc setName(person: PersonObj) = 
+#  person.name = "George"
+
+# Ok:
+proc setName(person: PersonRef) =
+  person.name = "George"
+
+
+# Tuples
+# nominative vs structural typing
+type
+  DogObj = object
+    name: string
+
+  CatObj = object 
+    name: string
+
+let dog: DogObj = DogObj(name: "Fluffy")
+let cat: CatObj = CatObj(name: "Fluffy")
+echo(dog == cat) # false
+
+# BUT
+type
+  DogTup = tuple
+    name: string
+  CatTup = tuple 
+    name: string
+
+let doggie: DogTup = (name: "Spot")
+let kitty: CatTup = (name: "Spot")
+echo(doggie == kitty) # true
+
+type
+  Point = tuple[x, y: int]
+  Point2 = (int, int)
+
+let pos: Point = (x: 100, y: 50)
+doAssert pos == (100, 50)
+
+let (x, y) = posx
+let (left, _) = pos
+doAssert x == pos[0]
+doAssert y == pos[1]
+doAssert left == x
+
+
+# Enums
