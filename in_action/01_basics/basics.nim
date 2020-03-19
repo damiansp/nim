@@ -231,7 +231,7 @@ type
     name: string
     age: int
 
-var person: Person(name: "Neo", age: 28)
+var person = Person(name: "Neo", age: 28)
 
 type
   PersonObj = object 
@@ -260,7 +260,7 @@ type
 
 let dog: DogObj = DogObj(name: "Fluffy")
 let cat: CatObj = CatObj(name: "Fluffy")
-echo(dog == cat) # false
+#echo(dog == cat) # false --> Now: Error: type mismatch
 
 # BUT
 type
@@ -280,7 +280,7 @@ type
 let pos: Point = (x: 100, y: 50)
 doAssert pos == (100, 50)
 
-let (x, y) = posx
+let (x, y) = pos
 let (left, _) = pos
 doAssert x == pos[0]
 doAssert y == pos[1]
@@ -288,3 +288,19 @@ doAssert left == x
 
 
 # Enums
+type
+  Color = enum
+    colRed,
+    colGreen,
+    colBlue
+
+let color: Color = colRed
+
+type 
+  PureColor {.pure.} = enum
+    red, green, blue 
+
+let pureColor = PureColor.red # dot syntax required for .pure.
+
+
+# Pragmata
