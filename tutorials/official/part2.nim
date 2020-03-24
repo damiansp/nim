@@ -165,3 +165,59 @@ except:
     e = getCurrentException()
     msg = getCurrentExceptionMsg()
   echo "Got exception ", repr(e), "with message ", msg
+
+
+# Generics
+type
+  BinaryTree*[T] = ref object # BinaryTree is a generic type with generic param
+    le, ri: BinaryTree[T]     # T; le(ft) and ri(ght) are subtrees; may be nil
+    data: T                   # data stored in node
+
+proc newNode*[T](data: T): BinaryTree[T] =
+  # node constuctor
+  new(result)
+  result.data = data
+
+proc add*[T](root: var BinaryTree[T], n: BinaryTree[T]) =
+  # insert node into tree
+  if root == nil:
+    root = n
+  else:
+    var it = root 
+    while it != nil:
+      # compare data items; uses generic cmp proc that works for any type that 
+      # has == and < operators
+      var c = cmp(it.data, n.data)
+      if c < 0:
+        if it.le == nil:
+          it.le = n
+          return
+        it = it.le
+      else:
+        if it.ri == nil:
+          it.ri = n
+          return
+        it = it.ri 
+
+proc add*[T](root: var BinaryTree[T], data: T) =
+  # convenience
+  add(root, newNode(data))
+
+iterator preorder*[T](root: BinaryTree[T]): T =
+  # Preorder traversal of BinaryTree
+  # Since recursive iterators not yet implemented, use a (more efficient) explicit
+  # stack 
+  var stack: seq[BinaryTree[T]] = @[root]
+  while stack.len > 0:
+    var n = stack.pop()
+    while n != nil:
+      yield n.data 
+      add(stack, n.ri) # push r subtree onto the stack and follow l pointer
+      n = n.le
+
+var
+  root: BinaryTree[string]  # instantiate tree
+add(root, newNode("hello")) # instantiate node and add 
+add(root, "world")
+for str in preorder(root):
+  stdout.writeLine(str)
