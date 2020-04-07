@@ -7,3 +7,5 @@ type
 
 proc parseMessage*(data: string): Message =
   let dataJson = parseJson(data)
+  result.username = dataJson["username"].getStr()
+  result.message = dataJson["message"].getStr()
