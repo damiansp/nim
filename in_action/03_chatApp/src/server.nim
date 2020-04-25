@@ -46,7 +46,12 @@ proc loop(server: Server, port=7687) {.async.} =
                         id: server.clients.len,
                         isConnected: true)
     server.clients.add(client)
-    asyncCheck processMessages(server, client)
+    #asyncCheck processMessages(server, client)
+
+
+var server = newServer()
+
+waitFor loop(server)
 
 var server = newServer()
 waitFor loop(server)
