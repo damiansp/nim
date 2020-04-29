@@ -1,3 +1,4 @@
+#-------#-------#-------#-------#-------#-------#-------#-------#-------#-------
 import asyncdispatch, asyncnet
 
 
@@ -16,6 +17,24 @@ type
 proc newServer(): Server = Server(socket: newAsyncSocket(), clients: @[])
 
 
+proc `$`(client: Client): string =
+  $client.id & "(" & client.netAddr & ")"
+
+
+proc processMessages(server: Server, client: Client) {.async.} =
+  while true:
+    let line = await client.socket.recvLine()
+    if line.len == 0:
+      echo(client, " disconnected!")
+      client.isConnected = false
+      client.socket.close()
+      return
+    echo(client, " sent: ", line)
+    for c in server.clients:
+      if c.id != client.id and c.isConnected:
+        await c.socket.send(line & "\c\l")
+
+
 proc loop(server: Server, port=7687) {.async.} =
   server.socket.bindAddr(port.Port)
   server.socket.listen()
@@ -27,22 +46,8 @@ proc loop(server: Server, port=7687) {.async.} =
                         id: server.clients.len,
                         isConnected: true)
     server.clients.add(client)
-
-
-proc processMessages(server: Server, client: Client) {.async.} =
-  while true:
-    let line = await client.socket.recvLine()
-    if line.len == 0:
-      # as echo(client, ...) in book, but no mehthod to echo type client
-      echo(client.id, " disconnected") 
-      client.isConnected = false
-      client.socket.close()
-      return
-    # as echo(client, ...) in book, but no mehthod to echo type client
-    echo(client.id, " sent: ", line)
+    asyncCheck processMessages(server, client)
 
 
 var server = newServer()
-
 waitFor loop(server)
-
